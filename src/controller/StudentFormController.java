@@ -133,6 +133,15 @@ public class StudentFormController {
 
     }
 
-    public void menuDeleteOnAction(ActionEvent actionEvent) {
-    }
+    public void menuDeleteOnAction(ActionEvent actionEvent) throws SQLException, ClassNotFoundException {
+
+        Student selectedItem = tblStudent.getSelectionModel().getSelectedItem();
+
+        if (CrudUtil.execute("DELETE FROM Student WHERE student_id = ?",selectedItem.getId())){
+            new Alert(Alert.AlertType.CONFIRMATION,"Deleted.").show();
+            loadAllStudent();
+        }else{
+            new Alert(Alert.AlertType.WARNING,"Try Again!").show();
+        }    }
+
 }
