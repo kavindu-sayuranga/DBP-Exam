@@ -22,7 +22,7 @@ public class StudentFormController {
     public JFXTextField txtContact;
     public JFXTextField txtAddress;
     public JFXTextField txtNIC;
-    public TableView<StudentTM> tblStudent;
+    public TableView<Student> tblStudent;
     public TableColumn colStudentID;
     public TableColumn colStudentName;
     public TableColumn colEmail;
@@ -30,24 +30,63 @@ public class StudentFormController {
     public TableColumn colAddress;
     public TableColumn colNIC;
 
+    public void initialize(){
 
-    public void btnAddStudentOnAction(ActionEvent actionEvent) {
+        colStudentID.setCellValueFactory(new PropertyValueFactory("id"));
+        colStudentName.setCellValueFactory(new PropertyValueFactory("name"));
+        colEmail.setCellValueFactory(new PropertyValueFactory("email"));
+        colContact.setCellValueFactory(new PropertyValueFactory("contact"));
+        colAddress.setCellValueFactory(new PropertyValueFactory("address"));
+        colNIC.setCellValueFactory(new PropertyValueFactory("nic"));
+
+
+        try {
+            loadAllStudent();
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void btnAddStudentOnAction(ActionEvent actionEvent) throws SQLException, ClassNotFoundException {
         Student stu = new Student(
                 txtStudentID.getText(),txtStudentName.getText(), txtEmail.getText(),txtContact.getText(),txtAddress.getText(),txtNIC.getText()
         );
 
         try {
             if (CrudUtil.execute("INSERT INTO Student VALUES (?,?,?,?,?,?)",stu.getId(),stu.getName(),stu.getEmail(),stu.getContact(),stu.getAddress(),stu.getNic())){
-                new Alert(Alert.AlertType.CONFIRMATION, "Saved!..").show();
+                new Alert(Alert.AlertType.CONFIRMATION, "Saved Student!..").show();
             }
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
             new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
         }
+
+        loadAllStudent();
     }
 
+    private void loadAllStudent() throws ClassNotFoundException, SQLException {
+        ResultSet result = CrudUtil.execute("SELECT * FROM Student");
+        ObservableList<Student> obList = FXCollections.observableArrayList();
+
+        while (result.next()){
+            obList.add(
+                    new Student(
+                            result.getString("student_id"),
+                            result.getString("student_name"),
+                            result.getString("email"),
+                            result.getString("contact"),
+                            result.getString("address"),
+                            result.getString("nic")
+
+                            )
+            );
+        }
+        tblStudent.setItems(obList);
+
+    }
 
     public void menuUpdateOnAction(ActionEvent actionEvent) {
+        
     }
 
     public void menuDeleteOnAction(ActionEvent actionEvent) {
