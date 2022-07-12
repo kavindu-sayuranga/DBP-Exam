@@ -1,5 +1,6 @@
 package controller;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,6 +30,7 @@ public class StudentFormController {
     public TableColumn colContact;
     public TableColumn colAddress;
     public TableColumn colNIC;
+    public JFXButton btnAddStudent;
 
     public void initialize(){
 
@@ -48,7 +50,23 @@ public class StudentFormController {
     }
 
     public void btnAddStudentOnAction(ActionEvent actionEvent) throws SQLException, ClassNotFoundException {
-        Student stu = new Student(
+//        Student stu = new Student(
+//                txtStudentID.getText(),txtStudentName.getText(), txtEmail.getText(),txtContact.getText(),txtAddress.getText(),txtNIC.getText()
+//        );
+//
+//        try {
+//            if (CrudUtil.execute("INSERT INTO Student VALUES (?,?,?,?,?,?)",stu.getId(),stu.getName(),stu.getEmail(),stu.getContact(),stu.getAddress(),stu.getNic())){
+//                new Alert(Alert.AlertType.CONFIRMATION, "Saved Student!..").show();
+//            }
+//        } catch (ClassNotFoundException | SQLException e) {
+//            e.printStackTrace();
+//            new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
+//        }
+//
+//        loadAllStudent();
+
+        if (btnAddStudent.getText().equals("Add Student")) {
+                    Student stu = new Student(
                 txtStudentID.getText(),txtStudentName.getText(), txtEmail.getText(),txtContact.getText(),txtAddress.getText(),txtNIC.getText()
         );
 
@@ -62,6 +80,21 @@ public class StudentFormController {
         }
 
         loadAllStudent();
+        }else{
+            Student student = new Student(txtStudentID.getText(),txtStudentName.getText(),txtEmail.getText(),txtContact.getText(),txtAddress.getText(),txtNIC.getText());
+
+            boolean isUpdated = CrudUtil.execute("UPDATE Student SET student_name = ?, email = ?, contact = ? , address = ? , nic = ?  WHERE student_id = ? ",student.getName(),student.getEmail(),student.getContact(),student.getAddress(),student.getNic(),student.getId());
+
+            if (isUpdated){
+                new Alert(Alert.AlertType.CONFIRMATION,"Updated !...").show();
+                btnAddStudent.setText("Add Student");
+                txtStudentID.setEditable(true);
+                loadAllStudent();
+                //clearText();
+            }else {
+                new Alert(Alert.AlertType.ERROR,"Something Wrong").show();
+            }
+        }
     }
 
     private void loadAllStudent() throws ClassNotFoundException, SQLException {
@@ -86,7 +119,18 @@ public class StudentFormController {
     }
 
     public void menuUpdateOnAction(ActionEvent actionEvent) {
-        
+
+        Student selectedItem = tblStudent.getSelectionModel().getSelectedItem();
+
+        txtStudentID.setText(selectedItem.getId());
+        txtStudentName.setText(selectedItem.getName());
+        txtEmail.setText(selectedItem.getEmail());
+        txtContact.setText(selectedItem.getContact());
+        txtAddress.setText(selectedItem.getAddress());
+        txtNIC.setText(selectedItem.getNic());
+
+        btnAddStudent.setText("Update");
+
     }
 
     public void menuDeleteOnAction(ActionEvent actionEvent) {
